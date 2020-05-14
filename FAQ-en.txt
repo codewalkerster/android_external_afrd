@@ -1,0 +1,173 @@
+? What is Automatic Frame Rate (AFR)?
+? Do I really need this program?
+
+! Motion video is always filmed at certain frame rate.
+! Traditional movies are shot at 24 frames per second, TV broadcasting
+! uses 30/60 (NTSC standard) or 25/50 (PAL and SECAM standards) frames
+! per second.
+
+! TV will display content at a certain frame rate, which is called
+! "vertical refresh rate". Most TVs and displays can work at different
+! refresh rates.
+
+! When movie framerate is not a multiple of refresh rate, the picture
+! will play perceptibly non-evenly, which is sometimes referred as
+! "judder". This is especially perceived on scenes where camera
+! slowly moves sideways (panning). For example, when playing a 24
+! frames per second video on a TV which uses a 60 Hz refresh rate,
+! the order of frames displayed on TV will be:
+
+! 0 0 0 1 1 2 2 2 3 3 4 4 4 5 5 6 6 6 7 7 ...
+
+! As you can see, frames are displayed for a different period of time:
+! even frames are displayed three times (3/60 seconds) while odd frames
+! are displayed just two times (2/60 seconds). This is what makes you
+! feel uncomfortable while watching such content.
+
+! AFR is the process of harmonization between video frame rate and
+! vertical refresh rate. This doesn't always mean that refresh rate
+! must be set exactly to video frame rate; it is only important that
+! refresh rate must be a multiple of frame rate. For example, it is
+! perfectly acceptable to watch 30 frames-per-second content on a
+! 60Hz refresh rate display, because every frame will be displayed
+! two times (2/60 seconds), which is same as 1/30 seconds you would
+! get if refresh rate would be 30Hz.
+
+? Should I disable "system" auto framerate when using AFRd?
+? Many video players (KODI/SPMC, ViMu, Smart Youtube etc) have a option
+? to adjust TV refresh rate according to video. Should I enable it?
+
+! First of all, on most AmLogic-based devices these option do nothing.
+! In most cases it is broken - either in kernel, or in Android itself.
+! In some cases this option requires special support in Android API,
+! which is non-existent in most cases on AmLogic devices (except on
+! some Beelink and Minix boxes, maybe some others).
+
+! Second, no matter if it works, you must disable it - especially
+! if it really works, like the "framerate switcher" addon for KODI/SPMC.
+! The reason is that two working AFRs will always conflict.
+
+! In the better case you'll get longer "black screens" during refresh
+! rate switches, and in worst case you can even get "black screen forever"
+! until reboot.
+
+! That's why I always insist on disabling all other AFR subsystems
+! if you're using AFRd.
+
+? I still see "judder" in videos. Why?
+? Despite the fact that AFRd correctly switches refresh rate, I still
+? see frame judder on playback.
+
+! AFRd is not a magic pill, it will just switch display mode to one
+! that is most suitable for current movie.
+
+! Everything else depends on a lot of other factors - the quality of
+! video stream, the quality of the hardware decoder, the program
+! for playing video, the setup of your TV.
+
+? Green-ish/purple-ish image during playback
+? Sometimes during playback image becomes "greenish" (sometimes:
+? "purplish"). What do I do?
+
+! The usual reason for these faults are loose connections on
+! HDMI bus between the TV box and the TV.
+
+! Try replacing the HDMI cable with something of a better quality:
+! less flexible are better (although less handy), ferrite rings
+! are a bonus (bulges near the ends of the cable).
+
+! Also try inserting the cable into a different HDMI jack, if it
+! is possible.
+
+? Black screen on refresh rate switch
+? Sometimes after refresh rate switching screen becomes black and
+? won't restore (sometimes: will restore after video stops, or:
+? restores after I reboot the box).
+
+! This is your TV fault. Refresh rate switching is a stress situation
+! for a TV - it has to determine all the parameters of the incoming
+! video signal. Sometimes it fails to do it correctly, and it just
+! 'hangs', although this depends from model to model.
+
+! Some people assert that this does not happen if you switch HDMI bus
+! to RGB format (normally video signal is encoded in the YUV format).
+
+? How I can switch the HDMI bus to RGB format?
+? I heard this can help with "greenish image" / "black screens" /
+? bad karma etc.
+
+! Open "Settings" -> "Advanced settings" -> "Color space selection rules".
+! Replace the value "...=444" with "...=rgb". Don't touch the "420"
+! mode - it is not possible to transmit an RGB stream at 4k resolution
+! and >30hz refresh rates via HDMI 1.x.
+
+? My TV doesn't "like" certain refresh rates
+? I use the "Prefer exact refresh rates" option but, still, I want to use
+? 60Hz refresh instead of 30Hz. How can I do it?
+
+! Open "Advanced settings" -> "Blacklisted refresh rates" and add the
+! refresh rate of 30 (and, possibly, 29.97) Hz to the list.
+
+? At start of video display turns off even if framerate does not change.
+? Why after video start the screen goes to black for some time, even if
+? video framerate is not different from display refresh rate?
+
+! When video starts, after a short interval AFRd will turn the screen to
+! black to avoid displaying the first frames of the video, after which
+! usually a refresh rate switch happens, which is painful for eyes.
+
+! So, to make the switch easier for eyes it was found that a preliminary
+! switch to black helps.
+
+! But at the moment when AFRd switches display to black it doesn't know
+! yet the video framerate - detection is a lengthy process taking from
+! half to a few seconds. So, at the time AFRd turns display off it doesn't
+! know yet the framerate and can't avoid the unneccessary black screen.
+
+! If you wish, you can turn off this feature in preferences.
+
+? Why display doesn't turn off when I start one video immediately after another?
+
+! Preliminary switch to black takes action only if there's no active video.
+! If video was already started, AFRd will avoid turning screen to black
+! because it is not expected frame rate to change.
+
+! When video ends, AFRd will wait some time before restoring original
+! refresh rate. If you start a video immediately, it will be considered
+! a "continuation" of previous video, thus screen won't be turned off.
+
+! If you want display to turn off after the start of video, wait first
+! for the original refresh rate to restore.
+
+? What is the meaning of "Fractional rate usage policy" option?
+? What does the option that allows to choose between "fractional" and
+? "integer" refresh rates?
+
+! Usually AFRd will correctly "guess" the video frame rate (23.976 vs 24
+! and so on), but sometimes it may do it wrong.
+
+! If you mostly watch videos with "fractional" frame rates (23.976, 29.97,
+! 59.94 fps), or if you mostly watch videos with "integer" frame rates
+! (24, 30, 60 fps), you may decide to set this option to avoid AFRd
+! errors altogether.
+
+! But I recommend keeping this option to "auto" - first, because AFRd
+! most of the time does the right job and, second, because most likely
+! you won't see the difference between a 23.976 and 24 Hz refresh,
+! a slight error here will result in just a single frame inserted
+! or removed every ~41 seconds.
+
+? Why refresh rate doesn't switch on low-res videos in KODI/SPMC?
+? When playing in KODI/SPMC videos with low resolution (less than 720p),
+? refresh rate doesn't switch. Same happens with MX Player when using
+? the "SW" decoder option.
+
+! AFRd supports automatical framerate switching only when using the
+! hardware decoder. KODI developers decided to use, when possible
+! (if enough processor power) the software decoder.
+
+! In SPMC you can solve this problem by changing the options
+! "Accelerate MPEG2/MPEG4/h264/hevc" to "Always" in section
+! "Settings -> Player". In MX Player problem is solved by choosing
+! "HW" or "HW+" decoder option. In KODI this problem has no solution
+! yet.
